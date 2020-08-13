@@ -58,7 +58,6 @@ const Login = () => {
   const submitCredentials = async (credentials) => {
     try {
       const { data } = await publicFetch.post('authenticate', credentials);
-      console.log(data);
       dispatch({
         type: 'SUCCESS',
         payload: {
