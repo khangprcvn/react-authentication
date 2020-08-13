@@ -3,14 +3,11 @@ import {
   BrowserRouter as Router,
   Route,
   Switch,
-  Redirect
+  Redirect,
 } from 'react-router-dom';
 import './App.css';
 
-import {
-  AuthProvider,
-  AuthContext
-} from './context/AuthContext';
+import { AuthProvider, AuthContext } from './context/AuthContext';
 import { FetchProvider } from './context/FetchContext';
 
 import AppShell from './AppShell';
@@ -51,6 +48,7 @@ const UnauthenticatedRoutes = () => (
 
 const AuthenticatedRoute = ({ children, ...rest }) => {
   const auth = useContext(AuthContext);
+  console.log(rest);
   return (
     <Route
       {...rest}

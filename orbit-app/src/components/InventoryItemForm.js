@@ -7,10 +7,8 @@ import GradientButton from './common/GradientButton';
 
 const InventoryItemSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
-  itemNumber: Yup.string().required(
-    'Item number is required'
-  ),
-  unitPrice: Yup.string().required('Unit price is required')
+  itemNumber: Yup.string().required('Item number is required'),
+  unitPrice: Yup.string().required('Unit price is required'),
 });
 
 const InventoryItemForm = ({ onSubmit }) => {
@@ -19,11 +17,9 @@ const InventoryItemForm = ({ onSubmit }) => {
       initialValues={{
         name: '',
         itemNumber: '',
-        unitPrice: ''
+        unitPrice: '',
       }}
-      onSubmit={(values, { resetForm }) =>
-        onSubmit(values, resetForm)
-      }
+      onSubmit={(values, { resetForm }) => onSubmit(values, resetForm)}
       validationSchema={InventoryItemSchema}
       validateOnBlur={false}
     >

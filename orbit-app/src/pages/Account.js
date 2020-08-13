@@ -10,14 +10,11 @@ const Account = () => {
   const [successMessage, setSuccessMessage] = useState();
   const [errorMessage, setErrorMessage] = useState();
 
-  const setUserRole = async role => {
+  const setUserRole = async (role) => {
     try {
-      const { data } = await fetchContext.authAxios.patch(
-        'user-role',
-        {
-          role
-        }
-      );
+      const { data } = await fetchContext.authAxios.patch('user-role', {
+        role,
+      });
       setSuccessMessage(data.message);
     } catch (err) {
       setErrorMessage(err.response.data.message);
@@ -34,20 +31,16 @@ const Account = () => {
           <div className="mt-2 flex">
             <select
               defaultValue={auth.authState.userInfo.role}
-              onChange={e => setUserRole(e.target.value)}
+              onChange={(e) => setUserRole(e.target.value)}
             >
               <option value="user">User</option>
               <option value="admin">Admin</option>
             </select>
             {successMessage && (
-              <p className="text-green-700 ml-4">
-                {successMessage}
-              </p>
+              <p className="text-green-700 ml-4">{successMessage}</p>
             )}
             {errorMessage && (
-              <p className="text-red-500 ml-4">
-                {errorMessage}
-              </p>
+              <p className="text-red-500 ml-4">{errorMessage}</p>
             )}
           </div>
         </div>
