@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import Card from '../components/common/Card';
@@ -10,30 +10,75 @@ import FormError from './../components/FormError';
 import GradientBar from './../components/common/GradientBar';
 import GradientButton from '../components/common/GradientButton';
 import logo from './../images/logo.png';
+import { publicFetch } from '../util/fetch';
+import { Redirect } from 'react-router';
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().required('Email is required'),
-  password: Yup.string().required('Password is required')
+  password: Yup.string().required('Password is required'),
 });
 
-const Login = () => {
-  const [loginSuccess, setLoginSuccess] = useState();
-  const [loginError, setLoginError] = useState();
-  const [loginLoading, setLoginLoading] = useState(false);
+const initialState = {
+  loading: false,
+  success: '',
+  error: '',
+  redirect: false,
+};
 
-  const submitCredentials = async credentials => {
+const loginReducer = (state, action) => {
+  switch (action.type) {
+    case 'SUCCESS': {
+      return {
+        ...state,
+        loading: true,
+        success: action.payload.message,
+        redirect: true,
+      };
+    }
+
+    case 'FAIL': {
+      return {
+        ...state,
+        loading: false,
+        success: null,
+        error: action.payload.message,
+      };
+    }
+
+    default:
+      return state;
+  }
+};
+
+const Login = () => {
+  const [state, dispatch] = useReducer(loginReducer, initialState);
+
+  const { loading, success, error, redirect } = state;
+
+  const submitCredentials = async (credentials) => {
     try {
-      setLoginLoading(true);
+      const { data } = await publicFetch.post('authenticate', credentials);
+      console.log(data);
+      dispatch({
+        type: 'SUCCESS',
+        payload: {
+          message: data.message,
+        },
+      });
     } catch (error) {
-      setLoginLoading(false);
       const { data } = error.response;
-      setLoginError(data.message);
-      setLoginSuccess(null);
+      dispatch({
+        type: 'FAIL',
+        payload: {
+          error: data.message,
+        },
+      });
     }
   };
 
   return (
     <>
+      {redirect && <Redirect to="/dashboard" />}
       <section className="w-full sm:w-1/2 h-screen m-auto p-8 sm:pt-10">
         <GradientBar />
         <Card>
@@ -48,31 +93,22 @@ const Login = () => {
                 </h2>
                 <p className="text-gray-600 text-center">
                   Don't have an account?{' '}
-                  <Hyperlink
-                    to="signup"
-                    text="Sign up now"
-                  />
+                  <Hyperlink to="signup" text="Sign up now" />
                 </p>
               </div>
 
               <Formik
                 initialValues={{
                   email: '',
-                  password: ''
+                  password: '',
                 }}
-                onSubmit={values =>
-                  submitCredentials(values)
-                }
+                onSubmit={(values) => submitCredentials(values)}
                 validationSchema={LoginSchema}
               >
                 {() => (
                   <Form className="mt-8">
-                    {loginSuccess && (
-                      <FormSuccess text={loginSuccess} />
-                    )}
-                    {loginError && (
-                      <FormError text={loginError} />
-                    )}
+                    {success && <FormSuccess text={success} />}
+                    {error && <FormError text={error} />}
                     <div>
                       <div className="mb-2">
                         <div className="mb-1">
@@ -111,7 +147,7 @@ const Login = () => {
                       <GradientButton
                         type="submit"
                         text="Log In"
-                        loading={loginLoading}
+                        loading={loading}
                       />
                     </div>
                   </Form>

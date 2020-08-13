@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Formik } from 'formik';
+import { Redirect } from 'react-router';
 import * as Yup from 'yup';
 import Card from '../components/common/Card';
 import GradientButton from '../components/common/GradientButton';
@@ -10,25 +11,30 @@ import GradientBar from './../components/common/GradientBar';
 import FormError from './../components/FormError';
 import FormSuccess from './../components/FormSuccess';
 import logo from './../images/logo.png';
+import { publicFetch } from './../util/fetch';
 
 const SignupSchema = Yup.object().shape({
-  firstName: Yup.string().required(
-    'First name is required'
-  ),
+  firstName: Yup.string().required('First name is required'),
   lastName: Yup.string().required('Last name is required'),
-  email: Yup.string()
-    .email('Invalid email')
-    .required('Email is required'),
-  password: Yup.string().required('Password is required')
+  email: Yup.string().email('Invalid email').required('Email is required'),
+  password: Yup.string().required('Password is required'),
 });
 
 const Signup = () => {
   const [signupSuccess, setSignupSuccess] = useState();
   const [signupError, setSignupError] = useState();
   const [loginLoading, setLoginLoading] = useState(false);
+  const [redirectOnLogin, setRedirectOnLogin] = useState(false);
 
-  const submitCredentials = async credentials => {
+  const submitCredentials = async (credentials) => {
     try {
+      const { data } = await publicFetch.post('signup', credentials);
+      setSignupSuccess(data.message);
+      setSignupError('');
+      setTimeout(() => {
+        setRedirectOnLogin(true);
+      }, 700);
+      console.log(data);
       setLoginLoading(true);
     } catch (error) {
       setLoginLoading(false);
@@ -40,6 +46,7 @@ const Signup = () => {
 
   return (
     <>
+      {redirectOnLogin && <Redirect to="/dashboard" />}
       <section className="w-1/2 h-screen m-auto p-8 sm:pt-10">
         <GradientBar />
         <Card>
@@ -62,26 +69,16 @@ const Signup = () => {
                   firstName: '',
                   lastName: '',
                   email: '',
-                  password: ''
+                  password: '',
                 }}
-                onSubmit={values =>
-                  submitCredentials(values)
-                }
+                onSubmit={(values) => submitCredentials(values)}
                 validationSchema={SignupSchema}
               >
                 {() => (
                   <Form className="mt-8">
-                    {signupSuccess && (
-                      <FormSuccess text={signupSuccess} />
-                    )}
-                    {signupError && (
-                      <FormError text={signupError} />
-                    )}
-                    <input
-                      type="hidden"
-                      name="remember"
-                      value="true"
-                    />
+                    {signupSuccess && <FormSuccess text={signupSuccess} />}
+                    {signupError && <FormError text={signupError} />}
+                    <input type="hidden" name="remember" value="true" />
                     <div>
                       <div className="flex">
                         <div className="mb-2 mr-2 w-1/2">
