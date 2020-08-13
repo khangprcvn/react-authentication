@@ -1,29 +1,30 @@
-import React, { useReducer } from 'react';
-import { Form, Formik } from 'formik';
-import * as Yup from 'yup';
-import Card from '../components/common/Card';
-import Hyperlink from './../components/common/Hyperlink';
-import Label from './../components/common/Label';
-import FormInput from './../components/FormInput';
-import FormSuccess from './../components/FormSuccess';
-import FormError from './../components/FormError';
-import GradientBar from './../components/common/GradientBar';
-import GradientButton from '../components/common/GradientButton';
-import logo from './../images/logo.png';
-import { publicFetch } from '../util/fetch';
-import { Redirect } from 'react-router';
+import React, { useContext, useReducer } from 'react'
+import { Form, Formik } from 'formik'
+import * as Yup from 'yup'
+import Card from '../components/common/Card'
+import Hyperlink from './../components/common/Hyperlink'
+import Label from './../components/common/Label'
+import FormInput from './../components/FormInput'
+import FormSuccess from './../components/FormSuccess'
+import FormError from './../components/FormError'
+import GradientBar from './../components/common/GradientBar'
+import GradientButton from '../components/common/GradientButton'
+import logo from './../images/logo.png'
+import { publicFetch } from '../util/fetch'
+import { Redirect } from 'react-router'
+import { AuthContext } from '../context/AuthContext'
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().required('Email is required'),
   password: Yup.string().required('Password is required'),
-});
+})
 
 const initialState = {
   loading: false,
   success: '',
   error: '',
   redirect: false,
-};
+}
 
 const loginReducer = (state, action) => {
   switch (action.type) {
@@ -33,7 +34,7 @@ const loginReducer = (state, action) => {
         loading: true,
         success: action.payload.message,
         redirect: true,
-      };
+      }
     }
 
     case 'FAIL': {
@@ -42,38 +43,40 @@ const loginReducer = (state, action) => {
         loading: false,
         success: null,
         error: action.payload.message,
-      };
+      }
     }
 
     default:
-      return state;
+      return state
   }
-};
+}
 
 const Login = () => {
-  const [state, dispatch] = useReducer(loginReducer, initialState);
+  const [state, dispatch] = useReducer(loginReducer, initialState)
+  const authContext = useContext(AuthContext)
 
-  const { loading, success, error, redirect } = state;
+  const { loading, success, error, redirect } = state
 
   const submitCredentials = async (credentials) => {
     try {
-      const { data } = await publicFetch.post('authenticate', credentials);
+      const { data } = await publicFetch.post('authenticate', credentials)
+      authContext.setAuthState(data)
       dispatch({
         type: 'SUCCESS',
         payload: {
           message: data.message,
         },
-      });
+      })
     } catch (error) {
-      const { data } = error.response;
+      const { data } = error.response
       dispatch({
         type: 'FAIL',
         payload: {
           error: data.message,
         },
-      });
+      })
     }
-  };
+  }
 
   return (
     <>
@@ -157,7 +160,7 @@ const Login = () => {
         </Card>
       </section>
     </>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login
