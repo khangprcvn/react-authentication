@@ -16,26 +16,20 @@ import logo from './../images/logo.png';
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().required('Email is required'),
-  password: Yup.string().required('Password is required')
+  password: Yup.string().required('Password is required'),
 });
 
 const Login = () => {
   const authContext = useContext(AuthContext);
   const [loginSuccess, setLoginSuccess] = useState();
   const [loginError, setLoginError] = useState();
-  const [redirectOnLogin, setRedirectOnLogin] = useState(
-    false
-  );
+  const [redirectOnLogin, setRedirectOnLogin] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
 
-  const submitCredentials = async credentials => {
+  const submitCredentials = async (credentials) => {
     try {
       setLoginLoading(true);
-      const { data } = await publicFetch.post(
-        `authenticate`,
-        credentials
-      );
-
+      const { data } = await publicFetch.post(`authenticate`, credentials);
       authContext.setAuthState(data);
       setLoginSuccess(data.message);
       setLoginError(null);
@@ -68,31 +62,22 @@ const Login = () => {
                 </h2>
                 <p className="text-gray-600 text-center">
                   Don't have an account?{' '}
-                  <Hyperlink
-                    to="signup"
-                    text="Sign up now"
-                  />
+                  <Hyperlink to="signup" text="Sign up now" />
                 </p>
               </div>
 
               <Formik
                 initialValues={{
                   email: '',
-                  password: ''
+                  password: '',
                 }}
-                onSubmit={values =>
-                  submitCredentials(values)
-                }
+                onSubmit={(values) => submitCredentials(values)}
                 validationSchema={LoginSchema}
               >
                 {() => (
                   <Form className="mt-8">
-                    {loginSuccess && (
-                      <FormSuccess text={loginSuccess} />
-                    )}
-                    {loginError && (
-                      <FormError text={loginError} />
-                    )}
+                    {loginSuccess && <FormSuccess text={loginSuccess} />}
+                    {loginError && <FormError text={loginError} />}
                     <div>
                       <div className="mb-2">
                         <div className="mb-1">
