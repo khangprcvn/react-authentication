@@ -16,24 +16,32 @@ import { AuthContext } from '../context/AuthContext'
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().required('Email is required'),
-  password: Yup.string().required('Password is required'),
+  password: Yup.string().required('Password is required')
 })
 
 const initialState = {
   loading: false,
   success: '',
   error: '',
-  redirect: false,
+  redirect: false
 }
 
 const loginReducer = (state, action) => {
   switch (action.type) {
+    case 'IDLE': {
+      return {
+        ...state,
+        loading: true
+      }
+    }
+
     case 'SUCCESS': {
       return {
         ...state,
-        loading: true,
+        loading: false,
         success: action.payload.message,
         redirect: true,
+        error: ''
       }
     }
 
@@ -42,7 +50,7 @@ const loginReducer = (state, action) => {
         ...state,
         loading: false,
         success: null,
-        error: action.payload.message,
+        error: action.payload.message
       }
     }
 
@@ -57,23 +65,26 @@ const Login = () => {
 
   const { loading, success, error, redirect } = state
 
-  const submitCredentials = async (credentials) => {
+  const submitCredentials = async credentials => {
     try {
+      dispatch({
+        type: 'IDLE'
+      })
       const { data } = await publicFetch.post('authenticate', credentials)
       authContext.setAuthState(data)
       dispatch({
         type: 'SUCCESS',
         payload: {
-          message: data.message,
-        },
+          message: data.message
+        }
       })
     } catch (error) {
       const { data } = error.response
       dispatch({
         type: 'FAIL',
         payload: {
-          error: data.message,
-        },
+          message: data.message
+        }
       })
     }
   }
@@ -102,9 +113,9 @@ const Login = () => {
               <Formik
                 initialValues={{
                   email: '',
-                  password: '',
+                  password: ''
                 }}
-                onSubmit={(values) => submitCredentials(values)}
+                onSubmit={values => submitCredentials(values)}
                 validationSchema={LoginSchema}
               >
                 {() => (

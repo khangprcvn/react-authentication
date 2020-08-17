@@ -29,18 +29,17 @@ const AvatarDropdown = () => {
   const node = useRef()
   const auth = useContext(AuthContext)
   const { authState } = auth
-  console.log(authState)
   const [dropdownOpen, setDropdownOpen] = useState(false)
 
   const dropdownItems = [
     {
       title: 'Log Out',
       icon: faSignOutAlt,
-      onClick: auth.logout,
-    },
+      onClick: auth.logout
+    }
   ]
 
-  const handleClick = (e) => {
+  const handleClick = e => {
     if (!node.current.contains(e.target)) {
       setDropdownOpen(false)
     }

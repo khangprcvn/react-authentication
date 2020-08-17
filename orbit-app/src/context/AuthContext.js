@@ -13,7 +13,7 @@ const AuthProvider = ({ children }) => {
   const [authState, setAuthState] = React.useState({
     token,
     expiresAt,
-    userInfo: userInfo ? JSON.parse(userInfo) : {},
+    userInfo: userInfo ? JSON.parse(userInfo) : {}
   })
 
   const setAuthInfo = ({ token, userInfo, expiresAt }) => {
@@ -23,7 +23,7 @@ const AuthProvider = ({ children }) => {
     setAuthState({
       token,
       userInfo,
-      expiresAt,
+      expiresAt
     })
   }
 
@@ -32,7 +32,7 @@ const AuthProvider = ({ children }) => {
     setAuthState({
       token: null,
       expiresAt: null,
-      userInfo: {},
+      userInfo: {}
     })
     history.push('/login')
   }
@@ -43,13 +43,18 @@ const AuthProvider = ({ children }) => {
     return new Date().getTime() / 1000 < authState.expiresAt
   }
 
+  const isAdmin = () => {
+    return authState.userInfo.role === 'admin'
+  }
+
   return (
     <Provider
       value={{
         authState,
-        setAuthState: (authInfo) => setAuthInfo(authInfo),
+        setAuthState: authInfo => setAuthInfo(authInfo),
         isAuthenticated,
         logout,
+        isAdmin
       }}
     >
       {children}
